@@ -7,8 +7,11 @@ import YouTubeIcon from '@mui/icons-material/YouTube';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import ArticleIcon from '@mui/icons-material/Article';
 import Post from './Post';
-import {db, auth} from './firebaseConfig';
-import { collection, doc, getDoc, setDoc, onSnapshot } from "firebase/firestore"; 
+import {db} from './firebaseConfig';
+import { getDatabase, ref, onValue} from "firebase/database";
+import firebase from 'firebase/compat/app';
+import { collection, doc, getDocs, addDoc } from 'firebase/firestore';
+import { Timestamp, FieldValue, orderBy } from '@firebase/firestore';
 
 
 const Feed = () => {
@@ -17,25 +20,21 @@ const Feed = () => {
 
     const [posts, setPosts] = useState([]);
 
+    const postsCollectionRef = collection(db, 'posts');
+
     const getPosts =  async() => {
-        const getPosts = doc(db, 'posts', 'SF');
-        const finalPosts = await getDoc(getPosts);
-        console.log(finalPosts);
+        const data = await getDocs(postsCollectionRef);
+        setPosts(...posts, data.docs.map((doc) => ({...doc.data(), id:doc.id})))
     }
 
     useEffect(() => {
         getPosts();
     }, [])
 
-    const sendPost = (e) => {
+    const newPost = async(e) => {
         e.preventDefault();
-        db.collection('posts').add({
-            name:'Vincent Paul',
-            description:'Hello',
-            message:input,
-            photoURL:'',
-
-        })
+        setInput('');
+        await addDoc(postsCollectionRef, {name:'Vincent Paul', message:input, description:'@vincentpaul', photoURL:'', timestamp:Timestamp.now()})
     }
 
     return (
@@ -45,7 +44,7 @@ const Feed = () => {
                     <CreateIcon/>
                     <form>
                         <input value={input} onChange={(e) => setInput(e.target.value)} type='text'/>
-                        <button type='submit' onClick={sendPost}>Send</button>
+                        <button type='submit' onClick={newPost}>Send</button>
                     </form>
                 </div>
                 <div className="feed__inputOptions">
@@ -55,8 +54,9 @@ const Feed = () => {
                     <InputOption  title='Write Article' color='#e16744' Icon={ArticleIcon}/>
                 </div>
             </div>
-            {posts}
-            <Post name='Vincent Paul' description='test' message='Hello' />
+            {posts.map((post) => {
+                return <Post name={post.name} description={post.description} message={post.message} key={post.id} />
+            })}
         </div>
     )
 }
