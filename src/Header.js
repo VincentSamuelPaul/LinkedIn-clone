@@ -15,7 +15,7 @@ const Header = () => {
                 <img src='https://cdn-icons-png.flaticon.com/512/174/174857.png' alt='LinkedIn' />
                 <div className="header__search">
                 <SearchIcon/>
-                    <input type='text' />
+                    <input placeholder='Search' type='text' />
                 </div>
             </div>
             <div className="header__right">

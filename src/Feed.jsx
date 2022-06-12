@@ -14,7 +14,7 @@ import { collection, doc, getDocs, addDoc } from 'firebase/firestore';
 import { Timestamp, FieldValue, orderBy } from '@firebase/firestore';
 
 
-const Feed = () => {
+const Feed = ({ user }) => {
 
     const [input, setInput] = useState('');
 
@@ -34,7 +34,7 @@ const Feed = () => {
     const newPost = async(e) => {
         e.preventDefault();
         setInput('');
-        await addDoc(postsCollectionRef, {name:'Vincent Paul', message:input, description:'@vincentpaul', photoURL:'', timestamp:Timestamp.now()})
+        await addDoc(postsCollectionRef, {name:user.user.displayName, message:input, description:'today', photoURL:'', timestamp:Timestamp.now()})
     }
 
     return (
